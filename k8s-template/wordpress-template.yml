@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: '{{ userID }}'
+  name: '{{ userID }}'
+  namespace: '{{ userID }}'
+spec:
+  selector:
+    matchLabels:
+      app: '{{ userID }}'
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: '{{ userID }}'
+    spec:
+      containers:
+      - env:
+        - name: WORDPRESS_DB_HOST
+          value: docker.lala-1992.xyz
+        - name: WORDPRESS_DB_USER
+          value: user{{ userID }}
+        - name: WORDPRESS_DB_PASSWORD
+          value: password{{ userID }}
+        - name: WORDPRESS_DB_NAME
+          value: user{{ userID }}
+        image: wordpress
+        name: '{{ userID }}'
+        ports:
+        - containerPort: 80
+          name: wordpress
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: wordpress-persistent-storage
+        - mountPath: /etc/apache2/conf.d
+          name: apache-config
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - chown -R www-data:www-data /var/www/html
+        image: busybox
+        name: fix-permissions
+        volumeMounts:
+        - mountPath: /var/www/html
+          name: wordpress-persistent-storage
+      volumes:
+      - name: wordpress-persistent-storage
+        persistentVolumeClaim:
+          claimName: '{{ userID }}'
+      - configMap:
+          name: apache-config
+        name: apache-config

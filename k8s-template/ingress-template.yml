@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    app: "{{ userID }}"
+  name: "{{ userID }}"
+  namespace: "{{ userID }}"
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+  - host: {{ userDomain }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: service-{{ userID }}
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - {{ userDomain }}
+    secretName: {{ userID }}-com-tls
