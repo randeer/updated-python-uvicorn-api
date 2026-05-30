@@ -41,6 +41,13 @@ jobs:
         run: |
           curl -sSf http://127.0.0.1:8000/openapi.json | jq . | head -n 20
 
+      - name: Smoke test - create_text_file endpoint
+        run: |
+          curl -sSf -X POST http://127.0.0.1:8000/create_text_file/ \
+            -H "Content-Type: application/json" \
+            -d '{"username":"ci-test","email":"ci@example.com","userID":9999,"userDomain":"example.com"}' \
+            | jq . || true
+
       - name: Show uvicorn logs
         if: always()
         run: |
